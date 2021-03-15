@@ -1,0 +1,9 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/WordDiff/obj/Debug
+/WordDiff/obj/Release
+/WordDiff/WordDiff.csproj.user
+/.vs
+/WordDiff/bin/Release
