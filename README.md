@@ -7,6 +7,6 @@ Usage:
 
 `c:\> WordDiff base_doc derived_doc`
 
-where "base_doc" is the path to the orignal Word document and "base_doc" is the path to the modified/updated document.
+where "base_doc" is the path to the orignal Word document and "derived_doc" is the path to a modified/updated document.
 
 Execution make take a couple of seconds depending on documents load time. A new Word window with changes highlighted appears after the loading delay.
