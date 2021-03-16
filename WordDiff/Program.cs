@@ -22,6 +22,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Word = Microsoft.Office.Interop.Word;
 
 /// <summary>
@@ -39,10 +40,12 @@ namespace WordDiff
         /// </summary>
         /// <param name="args">function arguments, see usage above</param>
         /// <returns>0 success, otherwise error</returns>
-        static int Main(string[] args)
+        public static int Main(string[] args)
         {
             try
             {
+                PrintBanner();
+
                 if (args.Length != 2)
                 {
                     DieWithMessage("usage: WordDiff <base document> <modified document>");
@@ -76,7 +79,7 @@ namespace WordDiff
         /// Terminate with message
         /// </summary>
         /// <param name="msg">message to display</param>
-        static private void DieWithMessage(string msg)
+        private static void DieWithMessage(string msg)
         {
             Console.WriteLine(msg);
             Environment.Exit(1);
@@ -87,7 +90,7 @@ namespace WordDiff
         /// </summary>
         /// <param name="baseFile">Word document which is assumed to be the initial version.</param>
         /// <param name="editedFile">Word document which is assumed to contain changes to the initial version</param>
-        static void RunWordDiff(string baseFile, string editedFile)
+        private static void RunWordDiff(string baseFile, string editedFile)
         {
             // COM interop constants
             object interOpmissing = Type.Missing;
@@ -97,37 +100,97 @@ namespace WordDiff
             object interOpEditedFile = editedFile;
 
             // Create a hidden word instance
+            Console.WriteLine("Starting hidden Word instance.");
             Word.Application wordInstance = new Word.Application();
             wordInstance.Visible = false;
 
-            // open base and edited files
-            Word.Document baseDoc = wordInstance.Documents.Open(ref interOpBase,
-                   ref interOpmissing, ref interOpFALSE, ref interOpFALSE, ref interOpmissing,
-                   ref interOpmissing, ref interOpmissing, ref interOpmissing, ref interOpmissing,
-                   ref interOpmissing, ref interOpmissing, ref interOpTRUE, ref interOpmissing,
-                   ref interOpmissing, ref interOpmissing, ref interOpmissing);
-            Word.Document editedeDoc = wordInstance.Documents.Open(ref interOpEditedFile,
-                   ref interOpmissing, ref interOpFALSE, ref interOpFALSE, ref interOpmissing,
-                   ref interOpmissing, ref interOpmissing, ref interOpmissing, ref interOpmissing,
-                   ref interOpmissing, ref interOpmissing, ref interOpTRUE, ref interOpmissing,
-                   ref interOpmissing, ref interOpmissing, ref interOpmissing);
+            Word.Document baseDoc = null;
+            Word.Document editedeDoc = null;
+            Word.Document diffDoc = null;
+            try
+            {
+                // Open base and edited doc files
+                Console.WriteLine("Loading base document " + baseFile);
+                baseDoc = wordInstance.Documents.Open(ref interOpBase,
+                       ref interOpmissing, ref interOpFALSE, ref interOpFALSE, ref interOpmissing,
+                       ref interOpmissing, ref interOpmissing, ref interOpmissing, ref interOpmissing,
+                       ref interOpmissing, ref interOpmissing, ref interOpTRUE, ref interOpmissing,
+                       ref interOpmissing, ref interOpmissing, ref interOpmissing);
 
-            // create diff document
-            Word.Document doc = wordInstance.CompareDocuments(
-                    baseDoc, editedeDoc,
-                    Word.WdCompareDestination.wdCompareDestinationNew,
-                    Word.WdGranularity.wdGranularityWordLevel,
-                    true, true, true, true, true, true, true, true, true, true,
-                    "WordDiff",
-                    true);
+                Console.WriteLine("Loading modified document " + editedFile);
+                editedeDoc = wordInstance.Documents.Open(ref interOpEditedFile,
+                       ref interOpmissing, ref interOpFALSE, ref interOpFALSE, ref interOpmissing,
+                       ref interOpmissing, ref interOpmissing, ref interOpmissing, ref interOpmissing,
+                       ref interOpmissing, ref interOpmissing, ref interOpTRUE, ref interOpmissing,
+                       ref interOpmissing, ref interOpmissing, ref interOpmissing);
 
-            //close inputs
-            baseDoc.Close();
-            editedeDoc.Close();
+                // Create the diff document
+                Console.WriteLine("Creating comparsion document ..." + editedFile);
+                diffDoc = wordInstance.CompareDocuments(
+                        baseDoc, editedeDoc,
+                        Word.WdCompareDestination.wdCompareDestinationNew,
+                        Word.WdGranularity.wdGranularityWordLevel,
+                        true, true, true, true, true, true, true, true, true, true,
+                        "",
+                        true);
+            }
+            finally
+            {
+                // Close input documents
+                if (null != baseDoc)
+                {
+                    baseDoc.Close(false);
+                    Marshal.ReleaseComObject(baseDoc);
+                    baseDoc = null;
+                }
 
-            // show diff result
-            wordInstance.Visible = true;
-            wordInstance.Activate();
+                if (null != editedeDoc)
+                {
+                    editedeDoc.Close(false);
+                    Marshal.ReleaseComObject(editedeDoc);
+                    editedeDoc = null;
+                }
+            }
+
+            // show the diff result
+            if (null != diffDoc)
+            {
+                wordInstance.Visible = true;
+                diffDoc.Activate();
+                SetForegroundWindow(wordInstance.Application.ActiveWindow.Hwnd);
+            }
+            else
+            {
+                wordInstance.Quit();
+                Marshal.ReleaseComObject(wordInstance);
+                DieWithMessage("unknown error during creation of diff document.");
+            }
         }
+        /// <summary>
+        /// Display program banner to stdout
+        /// </summary>
+        private static void PrintBanner()
+        {
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var versionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+
+            string banner= string.Format(
+                "{0} - {1}  {2}\n",
+                assembly.GetName().Name,
+                assembly.GetName().Version,
+                versionInfo.LegalCopyright
+            );
+
+            Console.WriteLine(banner);
+        }
+
+        /// <summary>
+        /// C# wrapper for WIN32  SetForegroundWindow
+        /// </summary>
+        /// <param name="hwnd">window handle </param>
+        /// <returns>Win32 BOOL</returns>
+        [DllImport("User32.dll")]
+        [return: MarshalAs(UnmanagedType.U4)]
+        private static extern int SetForegroundWindow(int hwnd);
     }
 }
