@@ -24,6 +24,10 @@ using System;
 using System.IO;
 using Word = Microsoft.Office.Interop.Word;
 
+/// <summary>
+/// Small utility for using Word as a doc diff tool that can be called from
+/// from a console.
+/// </summary>
 namespace WordDiff
 {
     class Program

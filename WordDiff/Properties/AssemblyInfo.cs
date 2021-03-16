@@ -30,9 +30,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("WordDiff")]
 [assembly: AssemblyDescription("Word Diff Utility")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("https://github.com/nhjschulz/WordDiff")]
 [assembly: AssemblyProduct("WordDiff")]
-[assembly: AssemblyCopyright("Copyright ©  2021 Norbert Schulz")]
+[assembly: AssemblyCopyright("Copyright © 2021 Norbert Schulz")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
