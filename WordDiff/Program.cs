@@ -125,7 +125,7 @@ namespace WordDiff
                        ref interOpmissing, ref interOpmissing, ref interOpmissing);
 
                 // Create the diff document
-                Console.WriteLine("Creating comparsion document ..." + editedFile);
+                Console.WriteLine("Creating comparsion document ...");
                 diffDoc = wordInstance.CompareDocuments(
                         baseDoc, editedeDoc,
                         Word.WdCompareDestination.wdCompareDestinationNew,
@@ -175,9 +175,10 @@ namespace WordDiff
             var versionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
 
             string banner= string.Format(
-                "{0} - {1}  {2}\n",
+                "{0} - {1}.{2}  {3} [https://github.com/nhjschulz/WordDiff]\n",
                 assembly.GetName().Name,
-                assembly.GetName().Version,
+                assembly.GetName().Version.Major,
+                 assembly.GetName().Version.Minor,
                 versionInfo.LegalCopyright
             );
 
