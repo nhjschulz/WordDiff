@@ -112,14 +112,14 @@ namespace WordDiff
                 // Open base and edited doc files
                 Console.WriteLine("Loading base document " + baseFile);
                 baseDoc = wordInstance.Documents.Open(ref interOpBase,
-                       ref interOpmissing, ref interOpFALSE, ref interOpFALSE, ref interOpmissing,
+                       ref interOpmissing, ref interOpTRUE, ref interOpFALSE, ref interOpmissing,
                        ref interOpmissing, ref interOpmissing, ref interOpmissing, ref interOpmissing,
                        ref interOpmissing, ref interOpmissing, ref interOpTRUE, ref interOpmissing,
                        ref interOpmissing, ref interOpmissing, ref interOpmissing);
 
                 Console.WriteLine("Loading modified document " + editedFile);
                 editedeDoc = wordInstance.Documents.Open(ref interOpEditedFile,
-                       ref interOpmissing, ref interOpFALSE, ref interOpFALSE, ref interOpmissing,
+                       ref interOpmissing, ref interOpTRUE, ref interOpFALSE, ref interOpmissing,
                        ref interOpmissing, ref interOpmissing, ref interOpmissing, ref interOpmissing,
                        ref interOpmissing, ref interOpmissing, ref interOpTRUE, ref interOpmissing,
                        ref interOpmissing, ref interOpmissing, ref interOpmissing);
